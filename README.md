@@ -1,5 +1,3 @@
-# Protocol-D3-Library-Visualizer-
-A JavaScript library that visualizes network protocol distribution using D3.js and Wireshark packet capture data.
 # Protocol Breakdown D3 Library
 
 A JavaScript library using D3.js to show network protocol breakdown recorded from tools like Wireshark.
