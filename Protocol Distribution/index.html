@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Distribution D3 Library Project</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+        }
+        .bar {
+            fill: steelblue;
+        }
+        .bar:hover {
+            fill: orange;
+        }
+        .axis-label {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Protocol Distribution</h1>
+    <svg width="800" height="400"></svg>
+    <script>
+        d3.csv("packet_data.csv").then(function(data) {
+            const protocolCounts = Array.from(d3.group(data, d => d.protocol), ([protocol, values]) => ({
+                key: protocol,
+                value: values.length
+            }));
+            const margin = { top: 20, right: 20, bottom: 40, left: 40 }, 
+                  width = 800 - margin.left - margin.right, 
+                  height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            const x = d3.scaleBand()
+                .domain(protocolCounts.map(function(d) { return d.key; }))
+                .range([0, width])
+                .padding(0.1);
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(protocolCounts, function(d) { return d.value; })])
+                .nice()
+                .range([height, 0]);
+
+            svg.selectAll(".bar")
+                .data(protocolCounts)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.key); })
+                .attr("y", function(d) { return y(d.value); })
+                .attr("width", x.bandwidth())
+                .attr("height", function(d) { return height - y(d.value); });
+
+            svg.append("g")
+                .attr("class", "x-axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+            svg.append("g")
+                .attr("class", "y-axis")
+                .call(d3.axisLeft(y));
+        }).catch(function(error) {
+            console.error('Error loading or parsing the CSV file: ', error);
+        });
+    </script>
+</body>
+</html>
